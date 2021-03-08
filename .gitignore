@@ -1,0 +1,3 @@
+/example-stm32f030/build/**
+sdkconfig
+sdkconfig.old
