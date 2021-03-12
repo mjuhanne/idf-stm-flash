@@ -214,8 +214,10 @@ esp_err_t flashSTM_from_URL(const char *url, const char * _digest, uint8_t write
 
     	if (_digest == NULL) {
     		// do not enforce checksum
+            flashLogInfo(FLASH_DOWNLOAD_MD5, "Skipping MD5 calculation");
     		valid_checksum = 1;
     	} else {
+            flashLogInfo(FLASH_DOWNLOAD_MD5, "MD5 parameter: '%s'", _digest);
     		if ( (strcmp(_digest,"FETCH") == 0) || (strncmp(_digest,"http", 4) == 0) ) {
 
                 if (strcmp(_digest,"FETCH") == 0) {
@@ -223,7 +225,7 @@ esp_err_t flashSTM_from_URL(const char *url, const char * _digest, uint8_t write
                     strncpy(filepath, url, FILE_PATH_MAX-1);
                     strncat(filepath, ".md5", FILE_PATH_MAX-strlen(filepath)-1);
                 } else {
-                    // _digest is the MD5 url 
+                    // _digest is the MD5 file url 
                     strncpy(filepath, _digest, FILE_PATH_MAX-1);
                 }
 
@@ -312,9 +314,11 @@ esp_err_t flashSTM_from_URL(const char *url, const char * _digest, uint8_t write
 
     if (output_buffer != NULL) {
         free(output_buffer);
+        output_buffer = NULL;
     }
     if (flash_buffer != NULL) {
         free(flash_buffer);
+        flash_buffer = NULL;
     }
 
 
