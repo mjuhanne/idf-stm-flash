@@ -1,7 +1,7 @@
 #include "stm_flash_http.h"
 #include "esp_http_client.h"
 #include "esp_tls.h"
-#include <esp32/rom/md5_hash.h>
+#include "esp_rom_md5.h"
 
 #define TAG "stm_flash_http"
 #define BASE_PATH "/spiffs/"
@@ -30,7 +30,7 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
             ESP_LOGI(TAG, "HTTP_EVENT_ON_CONNECTED");
 
 			memset(&myContext,0x00,sizeof(myContext));
-			MD5Init(&myContext);
+			esp_rom_md5_init(&myContext);
             if (output_buffer) {
                 free(output_buffer);
                 output_buffer = NULL;
@@ -68,7 +68,7 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     				output_len += evt->data_len;
                     flashNotification(current_task, FLASH_STAGE_CONTINUE, output_len, output_buffer_size, "Chunk received");
                     ESP_LOGD(TAG,"Chunk received. Total len %d", output_len);
-    				MD5Update(&myContext, (unsigned char*)evt->data, evt->data_len);
+    				esp_rom_md5_update(&myContext, (unsigned char*)evt->data, evt->data_len);
                 }
             }
 
@@ -77,7 +77,7 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
             ESP_LOGI(TAG, "HTTP_EVENT_ON_FINISH");
             if (esp_http_client_get_status_code(evt->client) == 200) {            
                 ESP_LOGI(TAG,"Total data len %d", output_len);
-                MD5Final(digest, &myContext);
+                esp_rom_md5_final(digest, &myContext);
             }
             break;
         case HTTP_EVENT_DISCONNECTED:
